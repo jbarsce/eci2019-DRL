@@ -39,10 +39,10 @@ for i in range(1, 500):
 
 env.close()
 
+acc_reward = 0
 # test code
 for i in range(1, 50):
     env.reset()
-    acc_reward = 0
 
     done=False
     while not done:
@@ -50,7 +50,4 @@ for i in range(1, 50):
         observation, reward, done, info = env.step(action)
         acc_reward += reward
 
-        if done:
-            break
-
-    print("Recomensa episodio {:d}: {:.2f}".format(i, acc_reward))
+print("Recompensa promedio de los últimos 50 episodios {:.2f}".format(acc_reward/50))
