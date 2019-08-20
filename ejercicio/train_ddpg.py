@@ -4,15 +4,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 from dqn.dqn import Agent
 import logging
+import torch
 
 logging.disable(logging.WARNING)
+render=False
 
 env = football_env.create_environment(
     env_name='academy_empty_goal_close',
     stacked=False,                           # solo estado, no pixeles
     representation='simple115',              # solo estado, no pixeles
     with_checkpoints=True,                   # solo estado, no pixeles
-    render=False                              # mostrar graficamente
+    render=render                              # mostrar graficamente
 )
 
 football_action_set.action_set_dict['default']
@@ -47,18 +49,14 @@ for episode_i in range(1, max_episodes):
         # avanzar estado
         state = next_state
 
-    if episode_i < max_episodes - 50:
-        epsilon = max(epsilon_min, epsilon_decay_rate * epsilon)
-    else:
-        epsilon = 0
+    epsilon = max(epsilon_min, epsilon_decay_rate * epsilon)
 
     reward_per_episode.append(acc_reward)
 
-    if episode_i % 50 == 0:
+    if episode_i % 50 == 0 or episode_i == (max_episodes-1):
         print("Recomensa últimos 50 episodios de episodio {:d}: {:.2f}".format(episode_i, np.mean(reward_per_episode[-50:])))
 
-last_50_reward = np.array(reward_per_episode)[-50:]
-print("Recompensa promedio de los últimos 50 episodios {:.2f}".format(np.sum(last_50_reward)/50))
+torch.save(agent.qnetwork_local.state_dict(), 'checkpoint_ddpg.pth')  # se guardan los pesos del agente entrenado
 
 env.close()
 
