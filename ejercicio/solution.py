@@ -3,7 +3,9 @@ from gfootball.env import football_action_set, scenario_builder
 import matplotlib.pyplot as plt
 import numpy as np
 from dqn.dqn import Agent
-from collections import deque
+import logging
+
+logging.disable(logging.WARNING)
 
 env = football_env.create_environment(
     env_name='academy_empty_goal_close',
