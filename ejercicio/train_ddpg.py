@@ -2,7 +2,7 @@ import gfootball.env as football_env
 from gfootball.env import football_action_set, scenario_builder
 import matplotlib.pyplot as plt
 import numpy as np
-from dqn.dqn import Agent
+from ddpg.ddpg_agent import Agent
 import logging
 import torch
 
@@ -20,14 +20,11 @@ env = football_env.create_environment(
 football_action_set.action_set_dict['default']
 
 # hyper-parameters
-epsilon = 0.99
-epsilon_min = 0.01
-epsilon_decay_rate = 0.995
 gamma = 0.99
 
 max_episodes = 1000
 
-agent = Agent(state_size=115, action_size=21, seed=0)
+agent = Agent(state_size=115, action_size=21, random_seed=0)
 reward_per_episode = []
 
 for episode_i in range(1, max_episodes):
@@ -36,20 +33,22 @@ for episode_i in range(1, max_episodes):
 
     done = False
     while not done:
-        action = agent.act(state, epsilon)
+        actions = agent.act(state)
+
+        actions_softmax = np.exp(actions)/np.sum(np.exp(actions))
+
+        action = np.random.choice(np.arange(21), p=actions_softmax)
         next_state, reward, done, info = env.step(action)
         acc_reward += reward
 
         # almacenar <St, At, Rt+1, St+1>
-        agent.memory.add(state, action, reward, next_state, done)
+        agent.memory.add(state, actions, reward, next_state, done)
 
         # train & update
-        agent.step(state, action, reward, next_state, done)
+        agent.step(state, actions, reward, next_state, done)
 
         # avanzar estado
         state = next_state
-
-    epsilon = max(epsilon_min, epsilon_decay_rate * epsilon)
 
     reward_per_episode.append(acc_reward)
 
