@@ -55,7 +55,8 @@ for episode_i in range(1, max_episodes):
     if episode_i % 50 == 0 or episode_i == (max_episodes-1):
         print("Recomensa últimos 50 episodios de episodio {:d}: {:.2f}".format(episode_i, np.mean(reward_per_episode[-50:])))
 
-torch.save(agent.qnetwork_local.state_dict(), 'checkpoint_ddpg.pth')  # se guardan los pesos del agente entrenado
+torch.save(agent.actor_local.state_dict(), 'checkpoint_actor.pth')
+torch.save(agent.critic_local.state_dict(), 'checkpoint_critic.pth')
 
 env.close()
 

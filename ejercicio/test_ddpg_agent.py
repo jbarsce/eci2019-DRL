@@ -19,8 +19,9 @@ env = football_env.create_environment(
 
 football_action_set.action_set_dict['default']
 
-agent = Agent(state_size=115, action_size=21, seed=0)
-agent.qnetwork_local.load_state_dict(torch.load('checkpoint_ddpg.pth'))
+agent = Agent(state_size=115, action_size=21, random_seed=0)
+agent.actor_local.load_state_dict(torch.load('checkpoint_actor.pth'))
+agent.critic_local.load_state_dict(torch.load('checkpoint_critic.pth'))
 reward_per_episode = []
 
 # observamos el agente ya entrenado por 50 episodios
@@ -32,7 +33,7 @@ for i in range(50):
     while not done:
         action = agent.act(state)
         if render: env.render()
-        state, reward, done, _ = env.step(action)
+        state, reward, done, _ = env.step(np.argmax(action))
         acc_reward += reward
 
     reward_per_episode.append(acc_reward)
